@@ -330,18 +330,19 @@ export const formations = [
       MID: 3,
       FWD: 3
     },
+    // Layout horizontal: GK a la izquierda, FWD a la derecha
     layout: [
-      { top: "85%", left: "50%" }, // GK
-      { top: "65%", left: "15%" }, // DEF
-      { top: "65%", left: "35%" }, // DEF
-      { top: "65%", left: "65%" }, // DEF
-      { top: "65%", left: "85%" }, // DEF
-      { top: "40%", left: "25%" }, // MID
-      { top: "40%", left: "50%" }, // MID
-      { top: "40%", left: "75%" }, // MID
-      { top: "15%", left: "25%" }, // FWD
-      { top: "15%", left: "50%" }, // FWD
-      { top: "15%", left: "75%" }  // FWD
+      { top: "50%", left: "5%" }, // GK
+      { top: "20%", left: "20%" }, // DEF
+      { top: "40%", left: "20%" }, // DEF
+      { top: "60%", left: "20%" }, // DEF
+      { top: "80%", left: "20%" }, // DEF
+      { top: "25%", left: "50%" }, // MID
+      { top: "50%", left: "50%" }, // MID
+      { top: "75%", left: "50%" }, // MID
+      { top: "30%", left: "80%" }, // FWD
+      { top: "50%", left: "80%" }, // FWD
+      { top: "70%", left: "80%" }  // FWD
     ]
   },
   {
@@ -353,17 +354,17 @@ export const formations = [
       FWD: 2
     },
     layout: [
-      { top: "85%", left: "50%" }, // GK
-      { top: "65%", left: "15%" }, // DEF
-      { top: "65%", left: "35%" }, // DEF
-      { top: "65%", left: "65%" }, // DEF
-      { top: "65%", left: "85%" }, // DEF
-      { top: "40%", left: "15%" }, // MID
-      { top: "40%", left: "35%" }, // MID
-      { top: "40%", left: "65%" }, // MID
-      { top: "40%", left: "85%" }, // MID
-      { top: "15%", left: "35%" }, // FWD
-      { top: "15%", left: "65%" }  // FWD
+      { top: "50%", left: "5%" }, // GK
+      { top: "20%", left: "20%" }, // DEF
+      { top: "40%", left: "20%" }, // DEF
+      { top: "60%", left: "20%" }, // DEF
+      { top: "80%", left: "20%" }, // DEF
+      { top: "20%", left: "50%" }, // MID
+      { top: "40%", left: "50%" }, // MID
+      { top: "60%", left: "50%" }, // MID
+      { top: "80%", left: "50%" }, // MID
+      { top: "35%", left: "80%" }, // FWD
+      { top: "65%", left: "80%" }  // FWD
     ]
   },
   {
@@ -375,17 +376,17 @@ export const formations = [
       FWD: 2
     },
     layout: [
-      { top: "85%", left: "50%" }, // GK
-      { top: "65%", left: "25%" }, // DEF
-      { top: "65%", left: "50%" }, // DEF
-      { top: "65%", left: "75%" }, // DEF
-      { top: "40%", left: "15%" }, // MID
-      { top: "40%", left: "30%" }, // MID
-      { top: "40%", left: "50%" }, // MID
-      { top: "40%", left: "70%" }, // MID
-      { top: "40%", left: "85%" }, // MID
-      { top: "15%", left: "35%" }, // FWD
-      { top: "15%", left: "65%" }  // FWD
+      { top: "50%", left: "5%" }, // GK
+      { top: "30%", left: "20%" }, // DEF
+      { top: "50%", left: "20%" }, // DEF
+      { top: "70%", left: "20%" }, // DEF
+      { top: "15%", left: "50%" }, // MID
+      { top: "35%", left: "50%" }, // MID
+      { top: "50%", left: "50%" }, // MID
+      { top: "65%", left: "50%" }, // MID
+      { top: "85%", left: "50%" }, // MID
+      { top: "35%", left: "80%" }, // FWD
+      { top: "65%", left: "80%" }  // FWD
     ]
   }
 ];

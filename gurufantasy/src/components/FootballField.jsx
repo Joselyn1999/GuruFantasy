@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { formations as allFormations } from '../data/players';
 
 const FootballField = ({ formation = "4-3-3", players = [] }) => {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addPosition, setAddPosition] = useState(null);
 
   const getPlayerPosition = (index) => {
     const positions = {
@@ -98,7 +101,35 @@ const FootballField = ({ formation = "4-3-3", players = [] }) => {
     { name: "Ferran Torres", position: "FWD", number: "7" },
   ];
 
+
+  // Obtener layout y posiciones de la formación
+  const formationObj = allFormations.find(f => f.name === formation);
+  const layout = formationObj?.layout || Array.from({ length: 11 }, (_, i) => getPlayerPosition(i));
+  const positionOrder = [];
+  if (formationObj) {
+    for (let pos in formationObj.positions) {
+      for (let i = 0; i < formationObj.positions[pos]; i++) {
+        positionOrder.push(pos);
+      }
+    }
+  } else {
+    // fallback
+    for (let i = 0; i < 11; i++) positionOrder.push("MID");
+  }
+
+  // Asignar jugadores a cada posición exacta (GK, DEF, MID, FWD)
   const playersToShow = players.length > 0 ? players : defaultPlayers;
+  const usedIndexes = new Set();
+  const fieldPlayers = positionOrder.map((posType, idx) => {
+    const foundIdx = playersToShow.findIndex((p, i) => p.position === posType && !usedIndexes.has(i));
+    if (foundIdx !== -1) {
+      usedIndexes.add(foundIdx);
+      return playersToShow[foundIdx];
+    }
+    return null; // hueco vacío
+  });
+  // Banquillo: los que no están en el campo
+  const benchPlayers = playersToShow.filter((_, i) => !usedIndexes.has(i));
 
   return (
     <div className="relative" onClick={closeCard}>
@@ -158,55 +189,119 @@ const FootballField = ({ formation = "4-3-3", players = [] }) => {
         <div className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-20 bg-white opacity-80 rounded-r"></div>
         <div className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-20 bg-white opacity-80 rounded-l"></div>
 
-        {/* Jugadores */}
-        {playersToShow.map((player, index) => {
-          const position = getPlayerPosition(index);
+        {/* Jugadores y posiciones vacías */}
+        {fieldPlayers.map((player, index) => {
+          const position = layout[index] || getPlayerPosition(index);
           const isSelected = selectedPlayer && selectedPlayer.index === index;
-          return (
-            <div
-              key={index}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 hover:scale-110 z-10"
-              style={{ top: position.top, left: position.left }}
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePlayerClick(player, index);
-              }}
-            >
+          if (player) {
+            return (
               <div
-                className={`w-14 h-14 rounded-full ${getPlayerColor(player.position)} border-3 border-white shadow-xl flex items-center justify-center cursor-pointer relative ${
-                  isSelected ? "ring-4 ring-yellow-400" : ""
-                }`}
+                key={index}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 hover:scale-110 z-10"
+                style={{ top: position.top, left: position.left }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePlayerClick(player, index);
+                }}
               >
-                <span className="text-white text-sm font-bold z-10">
-                  {player.position === "GK" ? "1" : player.number || (index + 1).toString()}
-                </span>
-                {/* Efecto de brillo */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/30 to-transparent"></div>
-              </div>
-
-              {/* Tarjeta del jugador (solo visible si está seleccionado) */}
-              {isSelected && (
                 <div
-                  className={`absolute bottom-full left-1/2 -translate-x-1/2 -translate-y-4 w-40 p-2 bg-slate-800 rounded-lg shadow-xl border border-gray-700 text-white text-center animate-fadeIn`}
-                  onClick={(e) => e.stopPropagation()}
+                  className={`w-14 h-14 rounded-full ${getPlayerColor(player.position)} border-3 border-white shadow-xl flex items-center justify-center cursor-pointer relative ${
+                    isSelected ? "ring-4 ring-yellow-400" : ""
+                  }`}
                 >
-                  <h3 className="font-bold text-sm mb-1">{selectedPlayer.name}</h3>
-                  <div
-                    className={`inline-block px-2 py-1 rounded-full ${getPlayerColor(
-                      selectedPlayer.position
-                    )} text-xs font-semibold`}
-                  >
-                    {getPositionName(selectedPlayer.position)}
-                  </div>
+                  <span className="text-white text-sm font-bold z-10">
+                    {player.position === "GK" ? "1" : player.number || (index + 1).toString()}
+                  </span>
+                  {/* Efecto de brillo */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/30 to-transparent"></div>
                 </div>
-              )}
-            </div>
-          );
+                {/* Tarjeta del jugador (solo visible si está seleccionado) */}
+                {isSelected && (
+                  <div
+                    className={`absolute bottom-full left-1/2 -translate-x-1/2 -translate-y-4 w-40 p-2 bg-slate-800 rounded-lg shadow-xl border border-gray-700 text-white text-center animate-fadeIn`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <h3 className="font-bold text-sm mb-1">{selectedPlayer.name}</h3>
+                    <div
+                      className={`inline-block px-2 py-1 rounded-full ${getPlayerColor(
+                        selectedPlayer.position
+                      )} text-xs font-semibold`}
+                    >
+                      {getPositionName(selectedPlayer.position)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          } else {
+            // Posición vacía: mostrar botón + en el campo
+            return (
+              <button
+                key={index}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10 w-14 h-14 rounded-full bg-white border-2 border-dashed border-gray-400 opacity-80 flex items-center justify-center text-gray-400 text-2xl font-bold hover:bg-blue-100 hover:text-blue-600 transition"
+                style={{ top: position.top, left: position.left }}
+                title={`Añadir ${getPositionName(positionOrder[index])}`}
+                onClick={() => { setShowAddModal(true); setAddPosition({ idx: index, type: positionOrder[index] }); }}
+              >
+                +
+              </button>
+            );
+          }
         })}
 
         {/* Indicador de formación */}
         <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-lg font-bold">
           {formation}
+        </div>
+
+        {/* Banquillo */}
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-2 w-[90%] flex flex-wrap justify-center gap-2 bg-black/30 p-2 rounded-lg">
+          {benchPlayers.length === 0 && (
+            <span className="text-white text-xs font-semibold self-center">Sin suplentes</span>
+          )}
+          {benchPlayers.map((player, idx) => (
+            <div
+              key={idx}
+              className={`w-10 h-10 rounded-full ${getPlayerColor(player.position)} border-2 border-white shadow flex items-center justify-center text-white text-xs font-bold`}
+              title={player.name}
+            >
+              {player.number || idx + 12}
+            </div>
+          ))}
+          {/* Mostrar huecos vacíos para añadir */}
+          {fieldPlayers.map((player, idx) => !player && (
+            <button
+              key={"empty-"+idx}
+              className="w-10 h-10 rounded-full bg-white border-2 border-dashed border-gray-400 opacity-60 flex items-center justify-center text-gray-400 text-xs font-semibold hover:bg-blue-100 hover:text-blue-600 transition"
+              title={`Añadir ${getPositionName(positionOrder[idx])}`}
+              onClick={() => { setShowAddModal(true); setAddPosition({ idx, type: positionOrder[idx] }); }}
+            >
+              +
+            </button>
+          ))}
+      {/* Modal para añadir jugador */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-80 relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onClick={() => setShowAddModal(false)}>&times;</button>
+            <h3 className="text-lg font-bold mb-2 text-center">Añadir jugador</h3>
+            <div className="mb-4 text-center text-gray-700">
+              Selecciona un jugador para la posición:
+              <span className="ml-1 font-semibold">{addPosition ? getPositionName(addPosition.type) : ''}</span>
+            </div>
+            {/* Aquí puedes mostrar un listado de jugadores disponibles para esa posición */}
+            <div className="flex flex-col gap-2">
+              <button className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700" onClick={() => setShowAddModal(false)}>
+                (Demo) Añadir jugador
+              </button>
+              <button className="bg-gray-200 text-gray-700 rounded px-4 py-2 font-semibold hover:bg-gray-300" onClick={() => setShowAddModal(false)}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+          <span className="ml-2 text-white text-xs font-semibold self-center">Banquillo</span>
         </div>
       </div>
     </div>
