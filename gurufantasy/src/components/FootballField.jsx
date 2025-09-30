@@ -1,5 +1,7 @@
+
 import { useState } from "react";
-import { formations as allFormations } from '../data/players';
+import { formations as allFormations, myTeam } from '../data/players';
+import PlayerCard from "./PlayerCard";
 
 const FootballField = ({ formation = "4-3-3", players = [] }) => {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
@@ -86,20 +88,13 @@ const FootballField = ({ formation = "4-3-3", players = [] }) => {
     setSelectedPlayer(null);
   };
 
-  // Datos de ejemplo si no se proporcionan jugadores
-  const defaultPlayers = [
-    { name: "Marc-André ter Stegen", position: "GK", number: "1" },
-    { name: "Ronald Araújo", position: "DEF", number: "4" },
-    { name: "Andreas Christensen", position: "DEF", number: "15" },
-    { name: "Alejandro Balde", position: "DEF", number: "3" },
-    { name: "Jules Koundé", position: "DEF", number: "23" },
-    { name: "Pedri", position: "MID", number: "8" },
-    { name: "Gavi", position: "MID", number: "6" },
-    { name: "Frenkie de Jong", position: "MID", number: "21" },
-    { name: "Raphinha", position: "FWD", number: "11" },
-    { name: "Robert Lewandowski", position: "FWD", number: "9" },
-    { name: "Ferran Torres", position: "FWD", number: "7" },
-  ];
+  // Usar plantilla realista de myTeam si no se pasan jugadores
+  const defaultPlayers = myTeam.players.map(p => ({
+    name: p.name,
+    position: p.position === 'DF' ? 'DEF' : p.position === 'MF' ? 'MID' : p.position === 'FW' ? 'FWD' : p.position,
+    number: p.number || '',
+    starter: p.starter
+  }));
 
 
   // Obtener layout y posiciones de la formación
@@ -193,60 +188,50 @@ const FootballField = ({ formation = "4-3-3", players = [] }) => {
         {fieldPlayers.map((player, index) => {
           const position = layout[index] || getPlayerPosition(index);
           const isSelected = selectedPlayer && selectedPlayer.index === index;
-          if (player) {
-            return (
-              <div
-                key={index}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 hover:scale-110 z-10"
-                style={{ top: position.top, left: position.left }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePlayerClick(player, index);
-                }}
-              >
-                <div
-                  className={`w-14 h-14 rounded-full ${getPlayerColor(player.position)} border-3 border-white shadow-xl flex items-center justify-center cursor-pointer relative ${
-                    isSelected ? "ring-4 ring-yellow-400" : ""
-                  }`}
+          return (
+            <div
+              key={index}
+              className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10"
+              style={{ top: position.top, left: position.left }}
+              // Aquí puedes agregar props de drop zone para drag & drop
+            >
+              {player ? (
+                <PlayerCard
+                  player={player}
+                  type="starter"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePlayerClick(player, index);
+                  }}
+                  // Aquí puedes agregar props de drag source para drag & drop
+                />
+              ) : (
+                <button
+                  className="w-14 h-14 rounded-full bg-white border-2 border-dashed border-gray-400 opacity-80 flex items-center justify-center text-gray-400 text-2xl font-bold hover:bg-blue-100 hover:text-blue-600 transition"
+                  title={`Añadir ${getPositionName(positionOrder[index])}`}
+                  onClick={() => { setShowAddModal(true); setAddPosition({ idx: index, type: positionOrder[index] }); }}
                 >
-                  <span className="text-white text-sm font-bold z-10">
-                    {player.position === "GK" ? "1" : player.number || (index + 1).toString()}
-                  </span>
-                  {/* Efecto de brillo */}
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/30 to-transparent"></div>
-                </div>
-                {/* Tarjeta del jugador (solo visible si está seleccionado) */}
-                {isSelected && (
+                  +
+                </button>
+              )}
+              {/* Tarjeta del jugador (solo visible si está seleccionado) */}
+              {isSelected && player && (
+                <div
+                  className={`absolute bottom-full left-1/2 -translate-x-1/2 -translate-y-4 w-40 p-2 bg-slate-800 rounded-lg shadow-xl border border-gray-700 text-white text-center animate-fadeIn`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <h3 className="font-bold text-sm mb-1">{selectedPlayer.name}</h3>
                   <div
-                    className={`absolute bottom-full left-1/2 -translate-x-1/2 -translate-y-4 w-40 p-2 bg-slate-800 rounded-lg shadow-xl border border-gray-700 text-white text-center animate-fadeIn`}
-                    onClick={(e) => e.stopPropagation()}
+                    className={`inline-block px-2 py-1 rounded-full ${getPlayerColor(
+                      selectedPlayer.position
+                    )} text-xs font-semibold`}
                   >
-                    <h3 className="font-bold text-sm mb-1">{selectedPlayer.name}</h3>
-                    <div
-                      className={`inline-block px-2 py-1 rounded-full ${getPlayerColor(
-                        selectedPlayer.position
-                      )} text-xs font-semibold`}
-                    >
-                      {getPositionName(selectedPlayer.position)}
-                    </div>
+                    {getPositionName(selectedPlayer.position)}
                   </div>
-                )}
-              </div>
-            );
-          } else {
-            // Posición vacía: mostrar botón + en el campo
-            return (
-              <button
-                key={index}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10 w-14 h-14 rounded-full bg-white border-2 border-dashed border-gray-400 opacity-80 flex items-center justify-center text-gray-400 text-2xl font-bold hover:bg-blue-100 hover:text-blue-600 transition"
-                style={{ top: position.top, left: position.left }}
-                title={`Añadir ${getPositionName(positionOrder[index])}`}
-                onClick={() => { setShowAddModal(true); setAddPosition({ idx: index, type: positionOrder[index] }); }}
-              >
-                +
-              </button>
-            );
-          }
+                </div>
+              )}
+            </div>
+          );
         })}
 
         {/* Indicador de formación */}
@@ -254,55 +239,42 @@ const FootballField = ({ formation = "4-3-3", players = [] }) => {
           {formation}
         </div>
 
-        {/* Banquillo */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-2 w-[90%] flex flex-wrap justify-center gap-2 bg-black/30 p-2 rounded-lg">
-          {benchPlayers.length === 0 && (
-            <span className="text-white text-xs font-semibold self-center">Sin suplentes</span>
-          )}
-          {benchPlayers.map((player, idx) => (
-            <div
-              key={idx}
-              className={`w-10 h-10 rounded-full ${getPlayerColor(player.position)} border-2 border-white shadow flex items-center justify-center text-white text-xs font-bold`}
-              title={player.name}
-            >
-              {player.number || idx + 12}
-            </div>
-          ))}
-          {/* Mostrar huecos vacíos para añadir */}
-          {fieldPlayers.map((player, idx) => !player && (
-            <button
-              key={"empty-"+idx}
-              className="w-10 h-10 rounded-full bg-white border-2 border-dashed border-gray-400 opacity-60 flex items-center justify-center text-gray-400 text-xs font-semibold hover:bg-blue-100 hover:text-blue-600 transition"
-              title={`Añadir ${getPositionName(positionOrder[idx])}`}
-              onClick={() => { setShowAddModal(true); setAddPosition({ idx, type: positionOrder[idx] }); }}
-            >
-              +
-            </button>
-          ))}
-      {/* Modal para añadir jugador */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-80 relative">
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onClick={() => setShowAddModal(false)}>&times;</button>
-            <h3 className="text-lg font-bold mb-2 text-center">Añadir jugador</h3>
-            <div className="mb-4 text-center text-gray-700">
-              Selecciona un jugador para la posición:
-              <span className="ml-1 font-semibold">{addPosition ? getPositionName(addPosition.type) : ''}</span>
-            </div>
-            {/* Aquí puedes mostrar un listado de jugadores disponibles para esa posición */}
-            <div className="flex flex-col gap-2">
-              <button className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700" onClick={() => setShowAddModal(false)}>
-                (Demo) Añadir jugador
-              </button>
-              <button className="bg-gray-200 text-gray-700 rounded px-4 py-2 font-semibold hover:bg-gray-300" onClick={() => setShowAddModal(false)}>
-                Cancelar
-              </button>
+  {/* Banquillo eliminado: ahora solo se muestra en 'Mi Equipo' */}
+        {/* Mostrar huecos vacíos para añadir (opcional, solo si quieres permitir añadir más suplentes) */}
+        {/*
+        {fieldPlayers.map((player, idx) => !player && (
+          <button
+            key={"empty-"+idx}
+            className="w-10 h-10 rounded-full bg-white border-2 border-dashed border-gray-400 opacity-60 flex items-center justify-center text-gray-400 text-xs font-semibold hover:bg-blue-100 hover:text-blue-600 transition"
+            title={`Añadir ${getPositionName(positionOrder[idx])}`}
+            onClick={() => { setShowAddModal(true); setAddPosition({ idx, type: positionOrder[idx] }); }}
+          >
+            +
+          </button>
+        ))}
+        */}
+        {/* Modal para añadir jugador */}
+        {showAddModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl p-6 w-80 relative">
+              <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onClick={() => setShowAddModal(false)}>&times;</button>
+              <h3 className="text-lg font-bold mb-2 text-center">Añadir jugador</h3>
+              <div className="mb-4 text-center text-gray-700">
+                Selecciona un jugador para la posición:
+                <span className="ml-1 font-semibold">{addPosition ? getPositionName(addPosition.type) : ''}</span>
+              </div>
+              {/* Aquí puedes mostrar un listado de jugadores disponibles para esa posición */}
+              <div className="flex flex-col gap-2">
+                <button className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700" onClick={() => setShowAddModal(false)}>
+                  (Demo) Añadir jugador
+                </button>
+                <button className="bg-gray-200 text-gray-700 rounded px-4 py-2 font-semibold hover:bg-gray-300" onClick={() => setShowAddModal(false)}>
+                  Cancelar
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-          <span className="ml-2 text-white text-xs font-semibold self-center">Banquillo</span>
-        </div>
+        )}
       </div>
     </div>
   );

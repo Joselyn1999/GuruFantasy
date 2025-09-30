@@ -73,12 +73,13 @@ const Dashboard = () => {
               formation={teamData.formation}
               budget={teamData.budget}
               totalValue={teamData.totalValue}
+              players={teamData.players}
               onFormationChange={handleFormationChange}
             />
             
             <FootballField 
               formation={teamData.formation} 
-              players={teamData.players.filter(p => p.starter)}
+              players={teamData.players}
             />
 
             {/* Selector de formación debajo del campo */}
