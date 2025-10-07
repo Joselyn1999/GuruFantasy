@@ -26,7 +26,7 @@ const PlayerCard = ({ player, type = "starter", onClick, ...rest }) => {
       {...rest}
     >
       <div
-        className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white ${POSITION_COLORS[player.position] || "bg-gray-400"} transition-all`}
+    className={`w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center text-white text-base font-bold shadow-lg border-2 border-white ${POSITION_COLORS[player.position] || "bg-gray-400"} transition-all`}
       >
         {/* Imagen si existe */}
         {player.image ? (
