@@ -317,6 +317,43 @@ export const myTeam = {
       points: 143,
       starter: false
     }
+      ,
+      { 
+        id: 16,
+        position: "DEF", 
+        name: "Koundé",
+        team: "Barcelona",
+        price: 13,
+        points: 56,
+        starter: false
+      },
+      { 
+        id: 17,
+        position: "MID", 
+        name: "Gavi",
+        team: "Barcelona",
+        price: 14,
+        points: 77,
+        starter: false
+      },
+      { 
+        id: 18,
+        position: "FWD", 
+        name: "Griezmann",
+        team: "Atlético Madrid",
+        price: 16,
+        points: 120,
+        starter: false
+      },
+      { 
+        id: 19,
+        position: "GK", 
+        name: "Unai Simón",
+        team: "Athletic Bilbao",
+        price: 10,
+        points: 65,
+        starter: false
+      }
   ]
 };
 

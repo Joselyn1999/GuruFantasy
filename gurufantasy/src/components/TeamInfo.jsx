@@ -31,23 +31,27 @@ const TeamInfo = ({ formation, budget, players = [] }) => {
       )}
 
       <div className="grid grid-cols-8 gap-2 mt-6">
-        <div className="text-center">
-          <div className="w-8 h-8 bg-yellow-400 rounded-full mx-auto mb-1"></div>
-          <span className="text-xs text-gray-600">Porter</span>
-        </div>
-        <div className="text-center">
-          <div className="w-8 h-8 bg-blue-500 rounded-full mx-auto mb-1"></div>
-          <span className="text-xs text-gray-600">Defens</span>
-        </div>
-        <div className="text-center">
-          <div className="w-8 h-8 bg-green-500 rounded-full mx-auto mb-1"></div>
-          <span className="text-xs text-gray-600">Centro</span>
-        </div>
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="text-center">
-            <div className="w-8 h-8 border-2 border-dashed border-gray-300 rounded-full mx-auto mb-1"></div>
+          <div className="text-center">
+            <div className="w-8 h-8 bg-yellow-400 rounded-full mx-auto mb-1"></div>
+            <span className="text-xs text-gray-600">Portero</span>
           </div>
-        ))}
+          <div className="text-center">
+            <div className="w-8 h-8 bg-blue-500 rounded-full mx-auto mb-1"></div>
+            <span className="text-xs text-gray-600">Defensa</span>
+          </div>
+          <div className="text-center">
+            <div className="w-8 h-8 bg-green-500 rounded-full mx-auto mb-1"></div>
+            <span className="text-xs text-gray-600">Centro</span>
+          </div>
+          <div className="text-center">
+            <div className="w-8 h-8 bg-red-500 rounded-full mx-auto mb-1"></div>
+            <span className="text-xs text-gray-600">Delantero</span>
+          </div>
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="text-center">
+              <div className="w-8 h-8 border-2 border-dashed border-gray-300 rounded-full mx-auto mb-1"></div>
+            </div>
+          ))}
       </div>
     </div>
   );
